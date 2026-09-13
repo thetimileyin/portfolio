@@ -160,21 +160,33 @@
     }
 
     function detectStories() {
-      var exts = ['jpg', 'jpeg', 'png', 'webp'];
-      var i = 1;
-      function tryIndex() {
-        return Promise.all(exts.map(function (ext) {
-          return checkImage('assets/stories/' + i + '.' + ext);
-        })).then(function (results) {
-          var found = results.filter(Boolean)[0];
-          if (found) {
-            stories.push(found);
-            i++;
-            if (i <= 150) return tryIndex();
-          }
+      var maxCheck = 120;
+      var fallbackExts = ['jpeg', 'png', 'webp'];
+      var indices = [];
+      for (var n = 1; n <= maxCheck; n++) indices.push(n);
+
+      return Promise.all(indices.map(function (i) {
+        return checkImage('assets/stories/' + i + '.jpg').then(function (found) {
+          if (found) return found;
+          return Promise.all(fallbackExts.map(function (ext) {
+            return checkImage('assets/stories/' + i + '.' + ext);
+          })).then(function (results) {
+            return results.filter(Boolean)[0] || null;
+          });
+        }).then(function (found) {
+          return { i: i, found: found };
         });
-      }
-      return tryIndex();
+      })).then(function (results) {
+        var byIndex = {};
+        results.forEach(function (r) {
+          if (r.found) byIndex[r.i] = r.found;
+        });
+        var i = 1;
+        while (byIndex[i]) {
+          stories.push(byIndex[i]);
+          i++;
+        }
+      });
     }
 
     detectStories().then(function () {
