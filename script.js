@@ -86,6 +86,40 @@
     toggle.innerHTML = iconFor(next);
   });
 
+  var navToggle = document.getElementById('navToggle');
+  var navLinksEl = document.getElementById('navLinksList');
+  if (navToggle && navLinksEl) {
+    var hamburgerIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H21M3 12H21M3 18H21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+    var closeNavIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
+    navToggle.innerHTML = hamburgerIcon;
+
+    function closeNav() {
+      navLinksEl.classList.remove('open');
+      navToggle.innerHTML = hamburgerIcon;
+      navToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    navToggle.addEventListener('click', function () {
+      var isOpen = navLinksEl.classList.toggle('open');
+      navToggle.innerHTML = isOpen ? closeNavIcon : hamburgerIcon;
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    navLinksEl.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', closeNav);
+    });
+
+    document.addEventListener('click', function (e) {
+      if (navLinksEl.classList.contains('open') && !navLinksEl.contains(e.target) && !navToggle.contains(e.target)) {
+        closeNav();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeNav();
+    });
+  }
+
   var timeEl = document.getElementById('localTime');
   if (timeEl) {
     var fmt = new Intl.DateTimeFormat('en-US', {
