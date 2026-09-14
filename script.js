@@ -27,13 +27,13 @@
 
     for (var p = 1; p <= AVATAR_POOL; p++) {
       var preloadAvatar = new Image();
-      preloadAvatar.src = 'assets/stories/' + p + '.jpg';
+      preloadAvatar.src = 'assets/stories/thumbs/' + p + '.jpg';
     }
 
     var avatarIdx = 1;
     var avatarTimer = setInterval(function () {
       avatarIdx = (avatarIdx % AVATAR_POOL) + 1;
-      loaderAvatarEl.src = 'assets/stories/' + avatarIdx + '.jpg';
+      loaderAvatarEl.src = 'assets/stories/thumbs/' + avatarIdx + '.jpg';
     }, 120);
 
     var loaderStart = null;
