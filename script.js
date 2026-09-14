@@ -25,6 +25,11 @@
       loaderNameEl.textContent = out;
     }
 
+    for (var p = 1; p <= AVATAR_POOL; p++) {
+      var preloadAvatar = new Image();
+      preloadAvatar.src = 'assets/stories/' + p + '.jpg';
+    }
+
     var avatarIdx = 1;
     var avatarTimer = setInterval(function () {
       avatarIdx = (avatarIdx % AVATAR_POOL) + 1;
