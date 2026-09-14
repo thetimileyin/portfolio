@@ -25,15 +25,20 @@
       loaderNameEl.textContent = out;
     }
 
-    for (var p = 1; p <= AVATAR_POOL; p++) {
-      var preloadAvatar = new Image();
-      preloadAvatar.src = 'assets/stories/thumbs/' + p + '.jpg';
-    }
+    var avatarBlobUrls = [];
+    Promise.all(Array.from({ length: AVATAR_POOL }, function (_, idx) {
+      return fetch('assets/stories/thumbs/' + (idx + 1) + '.jpg')
+        .then(function (res) { return res.blob(); })
+        .then(function (blob) { return URL.createObjectURL(blob); });
+    })).then(function (urls) {
+      avatarBlobUrls = urls;
+    });
 
     var avatarIdx = 1;
     var avatarTimer = setInterval(function () {
+      if (!avatarBlobUrls.length) return;
       avatarIdx = (avatarIdx % AVATAR_POOL) + 1;
-      loaderAvatarEl.src = 'assets/stories/thumbs/' + avatarIdx + '.jpg';
+      loaderAvatarEl.src = avatarBlobUrls[avatarIdx - 1];
     }, 120);
 
     var loaderStart = null;
@@ -62,6 +67,7 @@
         document.body.classList.add('revealed');
         setTimeout(function () {
           document.body.classList.remove('loading');
+          avatarBlobUrls.forEach(function (url) { URL.revokeObjectURL(url); });
         }, 1000);
       }, 200);
     }
