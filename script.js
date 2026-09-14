@@ -45,6 +45,7 @@
         loaderNameEl.textContent = TARGET_NAME;
         loaderCountEl.textContent = '100%';
         clearInterval(avatarTimer);
+        document.dispatchEvent(new Event('splashDone'));
         finishLoader();
       }
     }
@@ -110,7 +111,8 @@
     });
 
     document.addEventListener('click', function (e) {
-      if (navLinksEl.classList.contains('open') && !navLinksEl.contains(e.target) && !navToggle.contains(e.target)) {
+      var path = e.composedPath ? e.composedPath() : [e.target];
+      if (navLinksEl.classList.contains('open') && path.indexOf(navLinksEl) === -1 && path.indexOf(navToggle) === -1) {
         closeNav();
       }
     });
@@ -223,12 +225,20 @@
       });
     }
 
-    detectStories().then(function () {
-      if (stories.length > 0) {
-        avatarBtn.classList.add('has-story');
-        avatarBtn.addEventListener('click', openViewer);
-      }
-    });
+    function startStoryDetection() {
+      detectStories().then(function () {
+        if (stories.length > 0) {
+          avatarBtn.classList.add('has-story');
+          avatarBtn.addEventListener('click', openViewer);
+        }
+      });
+    }
+
+    if (document.body.classList.contains('loading')) {
+      document.addEventListener('splashDone', startStoryDetection, { once: true });
+    } else {
+      startStoryDetection();
+    }
 
     function buildProgress() {
       progressEl.innerHTML = '';
